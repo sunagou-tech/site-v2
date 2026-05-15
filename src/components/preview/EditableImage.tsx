@@ -79,7 +79,7 @@ export default function EditableImage({
     }
     return (
       <div className={`overflow-hidden ${className}`}>
-        <img src={url} alt={alt} className="w-full h-full object-cover object-top"
+        <img src={url} alt={alt} className="w-full h-full object-cover object-center"
           onError={() => setImgError(true)} />
       </div>
     );
@@ -124,7 +124,7 @@ export default function EditableImage({
           <img
             src={url}
             alt={alt}
-            className="w-full h-full object-cover object-top pointer-events-none"
+            className="w-full h-full object-cover object-center pointer-events-none"
             onError={() => setImgError(true)}
             onLoad={() => setImgError(false)}
           />

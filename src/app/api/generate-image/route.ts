@@ -7,8 +7,14 @@ const GEMINI_KEY  = process.env.GEMINI_API_KEY ?? "";
 const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/models";
 
 function openaiSize(aspect: string): string {
-  if (aspect === "16:9") return "1536x1024";
+  if (aspect === "16:9") return "1792x1024";
   if (aspect === "9:16") return "1024x1536";
+  return "1024x1024";
+}
+
+function gptImageSize(aspect: string): string {
+  if (aspect === "9:16") return "1024x1536";
+  if (aspect === "16:9") return "1536x1024";
   return "1024x1024";
 }
 
@@ -37,7 +43,7 @@ export async function POST(req: NextRequest) {
           model: "gpt-image-1",
           prompt: enhanced,
           n: 1,
-          size: openaiSize(aspectRatio),
+          size: gptImageSize(aspectRatio),
           output_format: "png",
         }),
         signal: AbortSignal.timeout(55000),

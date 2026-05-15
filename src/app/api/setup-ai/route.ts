@@ -10,6 +10,48 @@ const GEMINI_BASE     = "https://generativelanguage.googleapis.com/v1beta/models
 // 2.0系は v1beta generateContent 非対応のため 2.5系に統一
 const GEMINI_MODELS   = ["gemini-2.5-flash", "gemini-2.5-flash-lite"];
 
+async function generateHeroImageDataUrl(prompt: string): Promise<string | null> {
+  if (!API_KEY) return null;
+
+  const enhanced = [
+    prompt,
+    "wide 16:9 corporate website hero key visual",
+    "bright high-key Japanese commercial photography",
+    "natural faces and hands, realistic skin, clean edges",
+    "no stretching, no warped faces, no duplicated people, no low-resolution blur",
+    "no text, no watermark, no logo, no fake interface",
+  ].join(", ");
+
+  try {
+    const res = await fetch(
+      `${GEMINI_BASE}/imagen-4.0-fast-generate-001:predict?key=${API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          instances: [{ prompt: enhanced }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: "16:9",
+            safetyFilterLevel: "block_few",
+            personGeneration: "allow_adult",
+          },
+        }),
+        signal: AbortSignal.timeout(50000),
+      }
+    );
+    if (!res.ok) return null;
+    const data = await res.json() as {
+      predictions?: Array<{ bytesBase64Encoded?: string; mimeType?: string }>;
+    };
+    const image = data.predictions?.[0];
+    if (!image?.bytesBase64Encoded) return null;
+    return `data:${image.mimeType ?? "image/png"};base64,${image.bytesBase64Encoded}`;
+  } catch {
+    return null;
+  }
+}
+
 // ── 6種のデザインシステム定義 ────────────────────────────────
 const DESIGN_SYSTEMS: Record<string, GlobalStyle & { _desc: string }> = {
   corporate: {
@@ -726,10 +768,24 @@ function pickHeroBlock(data: SectionData, dna?: GlobalStyle): SectionBlock {
   const style    = dna?.designStyle?.toLowerCase() ?? "";
   const notes    = (dna?.designNotes ?? "").toLowerCase();
   const stats    = h.stats ?? [];
+  const isEducation =
+    notes.includes("学習") ||
+    notes.includes("塾") ||
+    notes.includes("受験") ||
+    notes.includes("教育") ||
+    notes.includes("高校") ||
+    notes.includes("小学生") ||
+    notes.includes("中学生");
   // URL解析で得たレイアウトヒント（split/centered/typographic/light）
   const layoutHint = dna?.heroLayout ?? "";
 
   const pool: string[] = (() => {
+    if (isEducation) {
+      return hasImage
+        ? ["hero-photo", "hero-photo", "hero-japanese"]
+        : ["hero-minimal", "hero-typo"];
+    }
+
     // ── URL解析のheroLayoutを最優先 ──────────────────────────────
     if (layoutHint === "split")
       return hasImage
@@ -1492,11 +1548,15 @@ export async function POST(req: NextRequest) {
     const parsed = JSON.parse(parseTarget) as SectionData;
 
     if (!parsed.hero.imageUrl && parsed.hero.heroImagePrompt) {
-      const prompt = encodeURIComponent(
-        parsed.hero.heroImagePrompt + ", Benesse-style Japanese corporate education hero image, wide 16:9, full-bleed first-view key visual, bright high-key lighting, optimistic learning atmosphere, central negative space for a short dark tagline, photorealistic, shot on camera, authentic Japanese commercial photography, no watermark, no text, no fake UI, no dark vignette, no glossy AI look, no distorted objects"
-      );
-      parsed.hero.imageUrl =
-        `https://image.pollinations.ai/prompt/${prompt}?width=1920&height=1080&model=flux&nologo=true&seed=${Date.now() % 9999}`;
+      const heroPrompt = parsed.hero.heroImagePrompt + ", Benesse-style Japanese corporate education hero image, wide 16:9, full-bleed first-view key visual, bright high-key lighting, optimistic learning atmosphere, central negative space for a short dark tagline, photorealistic, shot on camera, authentic Japanese commercial photography, no watermark, no text, no fake UI, no dark vignette, no glossy AI look, no distorted objects";
+      const generatedImage = await generateHeroImageDataUrl(heroPrompt);
+      if (generatedImage) {
+        parsed.hero.imageUrl = generatedImage;
+      } else {
+        const prompt = encodeURIComponent(heroPrompt + ", ultra high resolution, crisp details, clean anatomy");
+        parsed.hero.imageUrl =
+          `https://image.pollinations.ai/prompt/${prompt}?width=2560&height=1440&model=flux&nologo=true&seed=${Date.now() % 9999}`;
+      }
     }
 
     // AIが返すデフォルト色はテンプレート値か明るすぎる場合は無視する。
