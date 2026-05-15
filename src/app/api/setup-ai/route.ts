@@ -199,7 +199,15 @@ const GENERATE_SYSTEM = `日本市場向けWebサイトのコンテンツをJSON
 - 強み：抽象的な言葉（高品質、丁寧）は使わず、数値・実績・仕組みで証明する
 - お客様の声：「〜が改善されました」ではなく「〜が3倍になりました」と具体的変化
 - CTA：「無料相談はこちら」+「初回30分無料」など安心感のある補足を必ず添える
-- 数字の格式：件数・割合・日数・年数など複数の数値軸を組み合わせてリアリティを出す`;
+- 数字の格式：件数・割合・日数・年数など複数の数値軸を組み合わせてリアリティを出す
+
+【AIっぽさを消す編集方針】
+- 汎用LPの定番構成にしない。「こんなお悩み」「選ばれる理由」「本気のあなた」などの抽象見出しを避け、業種・顧客・場面が伝わる固有表現にする
+- ファーストビューは企業サイト/ブランドサイトの編集感を優先する。暗い写真の上に中央寄せ白文字を置く構成に寄せない
+- すべてをカード化しない。短いステートメント、実績、サービス領域、現場写真、余白のある情報整理を混ぜる
+- ベネッセのように、写真・図解・サービス情報・ニュースが自然に並ぶ実在企業サイトの温度感を目指す
+- 「AIで作りました」と見える装飾（過剰なグラデーション、ガラスカード、均等な3カード、曖昧な人物写真、丸い装飾オブジェクト）は避ける
+- コピーは広告っぽく盛りすぎず、会社が本当に言いそうな具体性と抑制を持たせる`;
 
 const DESIGN_CONTROL_RULES = `【色・デザイン反映ルール】
 - ヒアリング内の「色合い」「雰囲気」「避けたいデザイン」を最優先する
@@ -209,7 +217,10 @@ const DESIGN_CONTROL_RULES = `【色・デザイン反映ルール】
 - catchCopy は20字以内。hero.heading は改行なしで12〜15字が理想。どうしても2行にする場合のみ「短い1行目\\n短い2行目」で各行10字以内にする
 - 「〜を、〜に。」「〜が、変わる。」形式の短くリズムある一文が最もかっこよく見える。長いと折れて安っぽくなる
 - 青（ネイビー・ブルー系）をデフォルトにしない。業種・ターゲット・雰囲気から色を選ぶ
-- 【画像プロンプト】heroImagePrompt は必ず英語で、16:9横長・左1/3が空白（テキスト用）・主要素は中央〜右に配置する構図を意識した説明にすること。学習塾・教育系では「自習室・参考書・ノート・机・赤本」などの物撮りシーンを指定し人物（顔）は含めない。例: "Japanese self-study room interior, red exam prep books stacked on wooden desk center-right, notebooks and pencils, warm focused lighting, wide 16:9, left side empty for text overlay, no people"`;
+- ファーストビューは「背景画像全面＋黒オーバーレイ＋中央見出し」にしない。左右分割、写真主役、余白のある企業サイト風、編集記事風を優先する
+- セクション見出しは固有化する。「こんなお悩みはありませんか？」「選ばれる理由」「ご利用の流れ」をそのまま使わず、事業内容に合わせて言い換える
+- カード文言は短くしすぎない。実績・対象者・現場の状況が伝わる名詞を入れる
+- 【画像プロンプト】heroImagePrompt は必ず英語で、実在企業サイトのキービジュアルのような自然光・編集写真・余白・質感を指定すること。暗いオーバーレイ前提にしない。学習塾・教育系では「自習室・参考書・ノート・机・赤本・教室の窓辺」などの物撮り/空間写真を指定し、人物の顔は主役にしない。例: "editorial photograph for a Japanese education company website, quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark"`;
 
 // ── Generate prompt builder（軽量版）────────────────────────────
 function buildGeneratePrompt(conversation: string, analysis?: GlobalStyle): string {
@@ -254,10 +265,10 @@ ${DESIGN_CONTROL_RULES}
     "bgColor": "${hb}",
     "eyebrow": "実績・権威ラベル（具体的数値入り）",
     "heading": "力強い一言キャッチ（15字以内・原則改行なし）",
-    "body": "サブコピー2文。ターゲットの悩みと解決を示す。",
+    "body": "サブコピー2文。ターゲットの状況と提供価値を具体的に示す。煽りすぎない。",
     "ctaText": "無料相談はこちら",
     "ctaHref": "#cta",
-    "heroImagePrompt": "学習塾・教育系なら→「Japanese self-study room interior, red exam prep books stacked center-right on wooden desk, notebooks, pencils, warm indoor light, wide 16:9, left side empty for text, no people」。それ以外の業種は→「realistic [業種 scene in English] environment, main subject positioned center-right, left third empty for text overlay, wide 16:9, no people, natural light」",
+    "heroImagePrompt": "学習塾・教育系なら→「editorial photograph for a Japanese education company website, quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark」。それ以外の業種は→「editorial brand photograph for a real Japanese [業種] company website, authentic workspace or service scene, natural light, clean composition, wide 16:9, calm professional color, no dark overlay, no text, no watermark」",
     "imageUrl": null,
     "stats": [
       {"value": "000件","label": "実績"},
@@ -267,7 +278,7 @@ ${DESIGN_CONTROL_RULES}
   },
   "problem": {
     "bgColor": "${bg}",
-    "heading": "こんなお悩みはありませんか？",
+    "heading": "顧客の状況が伝わる固有見出し（例：成績が伸び悩む理由）",
     "items": [
       {"title": "悩み1","desc": "詳細説明"},
       {"title": "悩み2","desc": "詳細説明"},
@@ -722,52 +733,54 @@ function pickHeroBlock(data: SectionData, dna?: GlobalStyle): SectionBlock {
     // ── URL解析のheroLayoutを最優先 ──────────────────────────────
     if (layoutHint === "split")
       return hasImage
-        ? ["hero-split", "hero-diagonal", "hero-dark", "hero-japanese"]
-        : ["hero-dark", "hero-centered"];
+        ? ["hero-photo", "hero-asym", "hero-split", "hero-diagonal", "hero-japanese"]
+        : ["hero-typo", "hero-interactive", "hero-dark"];
     if (layoutHint === "centered")
       return hasImage
-        ? ["hero-centered", "hero-glass", "hero-dark", "hero-typo"]
-        : ["hero-centered", "hero-typo", "hero-dark"];
+        ? ["hero-photo", "hero-asym", "hero-japanese", "hero-split"]
+        : ["hero-typo", "hero-interactive", "hero-minimal"];
     if (layoutHint === "typographic")
-      return ["hero-typo", "hero-dark", "hero-centered"];
+      return hasImage
+        ? ["hero-typo", "hero-photo", "hero-asym"]
+        : ["hero-typo", "hero-interactive", "hero-minimal"];
     if (layoutHint === "light")
       return hasImage
-        ? ["hero-centered", "hero-glass", "hero-japanese"]
-        : ["hero-centered", "hero-japanese"];
+        ? ["hero-photo", "hero-asym", "hero-japanese"]
+        : ["hero-minimal", "hero-typo", "hero-interactive"];
 
     // ── デザインスタイル別 ──────────────────────────────────────
     if (style === "minimal" || notes.includes("クリニック") || notes.includes("医療"))
       return hasImage
-        ? ["hero-centered", "hero-glass", "hero-japanese"]
-        : ["hero-centered", "hero-japanese"];
+        ? ["hero-photo", "hero-asym", "hero-japanese"]
+        : ["hero-minimal", "hero-typo", "hero-interactive"];
     if (style.includes("exam-prep") || style === "exam-prep-bold")
       return hasImage
-        ? ["hero-dark", "hero-diagonal", "hero-split", "hero-japanese"]
-        : ["hero-dark", "hero-centered"];
+        ? ["hero-photo", "hero-asym", "hero-split", "hero-diagonal"]
+        : ["hero-typo", "hero-dark", "hero-interactive"];
     if (style === "corporate" || style.includes("trustworthy") || style.includes("navy"))
       return hasImage
-        ? ["hero-split", "hero-dark", "hero-diagonal", "hero-japanese"]
-        : ["hero-centered", "hero-dark"];
+        ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese"]
+        : ["hero-typo", "hero-minimal", "hero-dark"];
     if (style === "bold" || style.includes("creative"))
       return hasImage
-        ? ["hero-typo", "hero-glass", "hero-diagonal"]
+        ? ["hero-typo", "hero-photo", "hero-asym", "hero-diagonal"]
         : ["hero-typo", "hero-interactive"];
     if (style === "elegant" || notes.includes("ビューティ") || notes.includes("女性"))
       return hasImage
-        ? ["hero-glass", "hero-split", "hero-typo"]
-        : ["hero-centered", "hero-typo"];
+        ? ["hero-photo", "hero-asym", "hero-split", "hero-typo"]
+        : ["hero-minimal", "hero-typo"];
     if (style === "warm" || style.includes("orange") || style.includes("friendly"))
       return hasImage
-        ? ["hero-centered", "hero-split", "hero-glass"]
-        : ["hero-centered", "hero-interactive"];
+        ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese"]
+        : ["hero-minimal", "hero-interactive", "hero-typo"];
     if (style.includes("tech") || notes.includes("saas") || notes.includes("ai"))
       return hasImage
-        ? ["hero-dark", "hero-glass", "hero-diagonal"]
-        : ["hero-interactive", "hero-centered", "hero-dark"];
+        ? ["hero-photo", "hero-asym", "hero-diagonal", "hero-typo"]
+        : ["hero-interactive", "hero-typo", "hero-dark"];
     // default
     return hasImage
-      ? ["hero-centered", "hero-dark", "hero-glass", "hero-diagonal", "hero-split", "hero-typo", "hero-japanese"]
-      : ["hero-centered", "hero-interactive", "hero-typo", "hero-dark"];
+      ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese", "hero-diagonal", "hero-typo"]
+      : ["hero-minimal", "hero-interactive", "hero-typo", "hero-dark"];
   })();
 
   const heroType = pool[Math.floor(Math.random() * pool.length)];
