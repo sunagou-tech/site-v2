@@ -220,7 +220,7 @@ const DESIGN_CONTROL_RULES = `【色・デザイン反映ルール】
 - ファーストビューは「背景画像全面＋黒オーバーレイ＋中央見出し」にしない。左右分割、写真主役、余白のある企業サイト風、編集記事風を優先する
 - セクション見出しは固有化する。「こんなお悩みはありませんか？」「選ばれる理由」「ご利用の流れ」をそのまま使わず、事業内容に合わせて言い換える
 - カード文言は短くしすぎない。実績・対象者・現場の状況が伝わる名詞を入れる
-- 【画像プロンプト】heroImagePrompt は必ず英語で、Codexの画像生成に渡しても破綻しにくい具体的な撮影指示にする。実在企業サイトのキービジュアルのような自然光・編集写真・余白・質感を指定し、暗いオーバーレイ前提にしない。学習塾・教育系では「自習室・参考書・ノート・机・赤本・教室の窓辺」などの物撮り/空間写真を指定し、人物の顔は主役にしない。例: "Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial photograph for a Japanese education company website: quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, realistic paper texture, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark, no plastic AI look"`;
+- 【画像プロンプト】heroImagePrompt は必ず英語で、ベネッセの企業サイトのように「明るい写真が主役」のキービジュアルを指定する。白く抜けた自然光、子ども/学生の学びの瞬間、広い余白、清潔な企業サイト写真を優先し、暗いオーバーレイ・黒背景・机上物撮りだけの重い絵にしない。学習塾・教育系では、顔が崩れにくいように人物は横顔・後ろ姿・小さめ・手元中心でもよいが、学びの高揚感が伝わる構図にする。例: "Use case: photorealistic-natural. Asset type: corporate education website hero. Bright high-key editorial photograph of Japanese students learning together with a laptop in a clean classroom, joyful candid moment, soft white daylight, airy composition, generous negative space around the center for a short tagline, fresh blue and white tone, realistic faces and hands, no dark overlay, no text, no watermark, no plastic AI look"`;
 
 // ── Generate prompt builder（軽量版）────────────────────────────
 function buildGeneratePrompt(conversation: string, analysis?: GlobalStyle): string {
@@ -268,7 +268,7 @@ ${DESIGN_CONTROL_RULES}
     "body": "サブコピー2文。ターゲットの状況と提供価値を具体的に示す。煽りすぎない。",
     "ctaText": "無料相談はこちら",
     "ctaHref": "#cta",
-    "heroImagePrompt": "学習塾・教育系なら→「Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial photograph for a Japanese education company website: quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, realistic paper texture, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark, no plastic AI look」。それ以外の業種は→「Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial brand photograph for a real Japanese [業種] company website: authentic workspace or service scene, natural light, real materials, clean composition, wide 16:9, calm professional color, no dark overlay, no text, no watermark, no plastic AI look」",
+    "heroImagePrompt": "学習塾・教育系なら→「Use case: photorealistic-natural. Asset type: corporate education website hero. Bright high-key editorial photograph of Japanese students learning together with a laptop in a clean classroom, joyful candid moment, soft white daylight, airy composition, generous negative space around the center for a short tagline, fresh blue and white tone, realistic faces and hands, no dark overlay, no text, no watermark, no plastic AI look」。それ以外の業種は→「Use case: photorealistic-natural. Asset type: corporate website hero. Bright high-key editorial photograph for a real Japanese [業種] company website, authentic service scene with people or real workspace, soft white daylight, airy composition, generous negative space around the center for a short tagline, clean corporate color, no dark overlay, no text, no watermark, no plastic AI look」",
     "imageUrl": null,
     "stats": [
       {"value": "000件","label": "実績"},
@@ -1493,7 +1493,7 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.hero.imageUrl && parsed.hero.heroImagePrompt) {
       const prompt = encodeURIComponent(
-        parsed.hero.heroImagePrompt + ", premium editorial website hero image, wide 16:9, magazine-quality art direction, natural daylight, real material texture, balanced negative space, subject positioned with room for adjacent copy panel, photorealistic, shot on camera, authentic Japanese commercial photography, no watermark, no text, no fake UI, no glossy AI look, no distorted objects, no people faces"
+        parsed.hero.heroImagePrompt + ", Benesse-style Japanese corporate education hero image, wide 16:9, full-bleed first-view key visual, bright high-key lighting, optimistic learning atmosphere, central negative space for a short dark tagline, photorealistic, shot on camera, authentic Japanese commercial photography, no watermark, no text, no fake UI, no dark vignette, no glossy AI look, no distorted objects"
       );
       parsed.hero.imageUrl =
         `https://image.pollinations.ai/prompt/${prompt}?width=1920&height=1080&model=flux&nologo=true&seed=${Date.now() % 9999}`;

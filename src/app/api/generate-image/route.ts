@@ -19,12 +19,12 @@ export async function POST(req: NextRequest) {
 
   const enhanced = [
     prompt,
-    "premium editorial website hero visual",
-    "photorealistic natural commercial photography",
-    "real material texture, natural daylight, clean composition",
-    "balanced negative space for adjacent copy panel",
-    "shot on camera, authentic, calm professional color grading",
-    "no text, no watermark, no fake UI, no glossy plastic AI look, no distorted objects",
+    "Benesse-style Japanese corporate website hero visual",
+    "bright high-key photorealistic commercial photography",
+    "optimistic learning or service atmosphere, soft white daylight, airy composition",
+    "generous central negative space for a short dark tagline",
+    "full-bleed first-view key visual, clean corporate color grading",
+    "no text, no watermark, no fake UI, no dark vignette, no glossy plastic AI look, no distorted objects",
   ].join(", ");
 
   // ── 1. OpenAI gpt-image-1 ──────────────────────────────────
