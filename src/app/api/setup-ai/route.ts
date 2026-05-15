@@ -220,7 +220,7 @@ const DESIGN_CONTROL_RULES = `【色・デザイン反映ルール】
 - ファーストビューは「背景画像全面＋黒オーバーレイ＋中央見出し」にしない。左右分割、写真主役、余白のある企業サイト風、編集記事風を優先する
 - セクション見出しは固有化する。「こんなお悩みはありませんか？」「選ばれる理由」「ご利用の流れ」をそのまま使わず、事業内容に合わせて言い換える
 - カード文言は短くしすぎない。実績・対象者・現場の状況が伝わる名詞を入れる
-- 【画像プロンプト】heroImagePrompt は必ず英語で、実在企業サイトのキービジュアルのような自然光・編集写真・余白・質感を指定すること。暗いオーバーレイ前提にしない。学習塾・教育系では「自習室・参考書・ノート・机・赤本・教室の窓辺」などの物撮り/空間写真を指定し、人物の顔は主役にしない。例: "editorial photograph for a Japanese education company website, quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark"`;
+- 【画像プロンプト】heroImagePrompt は必ず英語で、Codexの画像生成に渡しても破綻しにくい具体的な撮影指示にする。実在企業サイトのキービジュアルのような自然光・編集写真・余白・質感を指定し、暗いオーバーレイ前提にしない。学習塾・教育系では「自習室・参考書・ノート・机・赤本・教室の窓辺」などの物撮り/空間写真を指定し、人物の顔は主役にしない。例: "Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial photograph for a Japanese education company website: quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, realistic paper texture, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark, no plastic AI look"`;
 
 // ── Generate prompt builder（軽量版）────────────────────────────
 function buildGeneratePrompt(conversation: string, analysis?: GlobalStyle): string {
@@ -268,7 +268,7 @@ ${DESIGN_CONTROL_RULES}
     "body": "サブコピー2文。ターゲットの状況と提供価値を具体的に示す。煽りすぎない。",
     "ctaText": "無料相談はこちら",
     "ctaHref": "#cta",
-    "heroImagePrompt": "学習塾・教育系なら→「editorial photograph for a Japanese education company website, quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark」。それ以外の業種は→「editorial brand photograph for a real Japanese [業種] company website, authentic workspace or service scene, natural light, clean composition, wide 16:9, calm professional color, no dark overlay, no text, no watermark」",
+    "heroImagePrompt": "学習塾・教育系なら→「Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial photograph for a Japanese education company website: quiet self-study room, red exam prep books and open notebook on wooden desk, soft daylight from window, realistic paper texture, clean composition, wide 16:9, natural colors, no dark overlay, no text, no watermark, no plastic AI look」。それ以外の業種は→「Use case: photorealistic-natural. Asset type: premium website hero visual. Editorial brand photograph for a real Japanese [業種] company website: authentic workspace or service scene, natural light, real materials, clean composition, wide 16:9, calm professional color, no dark overlay, no text, no watermark, no plastic AI look」",
     "imageUrl": null,
     "stats": [
       {"value": "000件","label": "実績"},
@@ -733,53 +733,53 @@ function pickHeroBlock(data: SectionData, dna?: GlobalStyle): SectionBlock {
     // ── URL解析のheroLayoutを最優先 ──────────────────────────────
     if (layoutHint === "split")
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-split", "hero-diagonal", "hero-japanese"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-diagonal", "hero-japanese"]
         : ["hero-typo", "hero-interactive", "hero-dark"];
     if (layoutHint === "centered")
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-japanese", "hero-split"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-japanese", "hero-split"]
         : ["hero-typo", "hero-interactive", "hero-minimal"];
     if (layoutHint === "typographic")
       return hasImage
-        ? ["hero-typo", "hero-photo", "hero-asym"]
+        ? ["hero-photo", "hero-typo", "hero-photo", "hero-asym"]
         : ["hero-typo", "hero-interactive", "hero-minimal"];
     if (layoutHint === "light")
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-japanese"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-japanese"]
         : ["hero-minimal", "hero-typo", "hero-interactive"];
 
     // ── デザインスタイル別 ──────────────────────────────────────
     if (style === "minimal" || notes.includes("クリニック") || notes.includes("医療"))
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-japanese"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-japanese"]
         : ["hero-minimal", "hero-typo", "hero-interactive"];
     if (style.includes("exam-prep") || style === "exam-prep-bold")
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-split", "hero-diagonal"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-diagonal"]
         : ["hero-typo", "hero-dark", "hero-interactive"];
     if (style === "corporate" || style.includes("trustworthy") || style.includes("navy"))
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-japanese"]
         : ["hero-typo", "hero-minimal", "hero-dark"];
     if (style === "bold" || style.includes("creative"))
       return hasImage
-        ? ["hero-typo", "hero-photo", "hero-asym", "hero-diagonal"]
+        ? ["hero-photo", "hero-typo", "hero-photo", "hero-asym", "hero-diagonal"]
         : ["hero-typo", "hero-interactive"];
     if (style === "elegant" || notes.includes("ビューティ") || notes.includes("女性"))
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-split", "hero-typo"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-typo"]
         : ["hero-minimal", "hero-typo"];
     if (style === "warm" || style.includes("orange") || style.includes("friendly"))
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-japanese"]
         : ["hero-minimal", "hero-interactive", "hero-typo"];
     if (style.includes("tech") || notes.includes("saas") || notes.includes("ai"))
       return hasImage
-        ? ["hero-photo", "hero-asym", "hero-diagonal", "hero-typo"]
+        ? ["hero-photo", "hero-photo", "hero-asym", "hero-diagonal", "hero-typo"]
         : ["hero-interactive", "hero-typo", "hero-dark"];
     // default
     return hasImage
-      ? ["hero-photo", "hero-asym", "hero-split", "hero-japanese", "hero-diagonal", "hero-typo"]
+      ? ["hero-photo", "hero-photo", "hero-asym", "hero-split", "hero-japanese", "hero-diagonal", "hero-typo"]
       : ["hero-minimal", "hero-interactive", "hero-typo", "hero-dark"];
   })();
 
@@ -1493,7 +1493,7 @@ export async function POST(req: NextRequest) {
 
     if (!parsed.hero.imageUrl && parsed.hero.heroImagePrompt) {
       const prompt = encodeURIComponent(
-        parsed.hero.heroImagePrompt + ", wide 16:9 hero banner, main subject positioned center-right leaving left third empty for text overlay, safe-zone composition, photorealistic, shot on camera, authentic, natural lighting, no watermark, no text, no AI artifacts, no people faces"
+        parsed.hero.heroImagePrompt + ", premium editorial website hero image, wide 16:9, magazine-quality art direction, natural daylight, real material texture, balanced negative space, subject positioned with room for adjacent copy panel, photorealistic, shot on camera, authentic Japanese commercial photography, no watermark, no text, no fake UI, no glossy AI look, no distorted objects, no people faces"
       );
       parsed.hero.imageUrl =
         `https://image.pollinations.ai/prompt/${prompt}?width=1920&height=1080&model=flux&nologo=true&seed=${Date.now() % 9999}`;

@@ -17,7 +17,15 @@ export async function POST(req: NextRequest) {
   const { prompt, aspectRatio = "1:1" } = body;
   if (!prompt) return NextResponse.json({ error: "promptは必須です" }, { status: 400 });
 
-  const enhanced = `${prompt}, professional high quality photo, sharp focus, no text`;
+  const enhanced = [
+    prompt,
+    "premium editorial website hero visual",
+    "photorealistic natural commercial photography",
+    "real material texture, natural daylight, clean composition",
+    "balanced negative space for adjacent copy panel",
+    "shot on camera, authentic, calm professional color grading",
+    "no text, no watermark, no fake UI, no glossy plastic AI look, no distorted objects",
+  ].join(", ");
 
   // ── 1. OpenAI gpt-image-1 ──────────────────────────────────
   if (OPENAI_KEY) {

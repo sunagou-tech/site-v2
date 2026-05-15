@@ -17,82 +17,85 @@ export default function HeroPhotoBlockComponent({ block, config, onChange }: Pro
     config.fontFamily === "serif" ? "font-serif" : config.fontFamily === "mono" ? "font-mono" : "font-sans";
 
   return (
-    <section className={`grid grid-cols-1 md:grid-cols-[40%_60%] overflow-hidden ${fontClass}`} style={{ minHeight: "clamp(650px, 90vh, 720px)" }}>
-
-      {/* Left: solid primary color content area (40%) */}
+    <section
+      className={`relative isolate overflow-hidden bg-[#f7f6f2] ${fontClass}`}
+      style={{ minHeight: "clamp(660px, 92vh, 780px)" }}
+    >
       <div
-        className="relative flex flex-col justify-center px-8 md:px-12 py-16"
-        style={{ backgroundColor: config.primaryColor }}
-      >
-        {/* Left accent strip */}
-        <div
-          className="absolute left-0 top-0 bottom-0 w-1.5"
-          style={{ backgroundColor: config.accentColor }}
-        />
+        className="absolute inset-x-0 top-0 h-24 opacity-70"
+        style={{ background: `linear-gradient(180deg, ${config.primaryColor}10, transparent)` }}
+        aria-hidden="true"
+      />
 
-        <div className="pl-4 space-y-6">
-          {/* Eyebrow */}
-          <div className="flex items-center gap-3">
-            <div className="w-6 h-px" style={{ backgroundColor: config.accentColor }} />
+      <div className="mx-auto grid min-h-[inherit] w-full max-w-[1440px] grid-cols-1 items-stretch px-5 py-8 md:grid-cols-[minmax(360px,42%)_1fr] md:px-10 lg:px-14">
+        {/* Editorial copy panel */}
+        <div className="relative z-20 flex items-center md:py-12">
+          <div className="w-full max-w-[560px] border border-black/10 bg-white/92 px-7 py-8 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur md:-mr-16 md:px-10 md:py-11">
+            <div className="mb-7 flex items-center gap-4">
+              <div className="h-px w-10" style={{ backgroundColor: config.accentColor }} />
+              <EditableText
+                tag="span"
+                value={block.eyebrow}
+                onChange={(v) => u({ eyebrow: v })}
+                className="text-[11px] font-semibold uppercase text-gray-500"
+              />
+            </div>
+
             <EditableText
-              tag="span"
-              value={block.eyebrow}
-              onChange={(v) => u({ eyebrow: v })}
-              className="text-[10px] tracking-[0.4em] uppercase font-semibold text-white/60"
+              tag="h1"
+              value={block.tagline}
+              onChange={(v) => u({ tagline: v })}
+              multiline
+              className="block max-w-[11em] break-keep text-[clamp(2.2rem,5vw,5.8rem)] font-black leading-[1.04] text-gray-950 whitespace-pre-line"
             />
+
+            <div className="mt-7 h-px w-full bg-gray-200" />
+
+            <EditableText
+              tag="p"
+              value={block.body}
+              onChange={(v) => u({ body: v })}
+              multiline
+              className="mt-7 block max-w-[34em] text-[15px] leading-[2] text-gray-600 whitespace-pre-line"
+            />
+
+            <div className="mt-9 flex flex-wrap items-center gap-4">
+              <LinkableButton
+                label={block.buttonText}
+                url={block.buttonUrl ?? ""}
+                onLabelChange={(v) => u({ buttonText: v })}
+                onUrlChange={(v) => u({ buttonUrl: v })}
+                className="inline-flex items-center gap-2 rounded-none px-7 py-4 text-sm font-bold transition-opacity hover:opacity-85"
+                style={{ backgroundColor: config.primaryColor, color: "#ffffff" }}
+              />
+              <EditableText
+                tag="span"
+                value={block.caption}
+                onChange={(v) => u({ caption: v })}
+                className="text-[11px] leading-relaxed text-gray-400"
+              />
+            </div>
           </div>
-
-          {/* Tagline */}
-          <EditableText
-            tag="h1"
-            value={block.tagline}
-            onChange={(v) => u({ tagline: v })}
-            multiline
-            className="text-[clamp(1.6rem,4.5vw,4.5rem)] font-black text-white leading-[1.1] whitespace-pre-line tracking-tight block break-keep max-w-[12em]"
-          />
-
-          {/* Body */}
-          <EditableText
-            tag="p"
-            value={block.body}
-            onChange={(v) => u({ body: v })}
-            multiline
-            className="text-sm text-white/70 leading-[2] whitespace-pre-line block"
-          />
-
-          {/* CTA */}
-          <LinkableButton
-            label={block.buttonText}
-            url={block.buttonUrl ?? ""}
-            onLabelChange={(v) => u({ buttonText: v })}
-            onUrlChange={(v) => u({ buttonUrl: v })}
-            className="inline-flex items-center gap-2 text-sm font-bold px-8 py-4 rounded-full transition-all hover:scale-105 hover:opacity-90"
-            style={{ backgroundColor: config.accentColor, color: config.primaryColor }}
-          />
         </div>
 
-        {/* Caption bottom-right */}
-        <div className="absolute bottom-4 right-4">
-          <EditableText
-            tag="span"
-            value={block.caption}
-            onChange={(v) => u({ caption: v })}
-            className="text-[10px] italic text-white/30"
+        {/* Key visual */}
+        <div className="relative min-h-[390px] overflow-hidden md:my-12 md:min-h-0">
+          <EditableImage
+            url={block.imageUrl}
+            onChange={(url) => u({ imageUrl: url })}
+            className="absolute inset-0 h-full w-full"
+            placeholderGradient={`linear-gradient(160deg, ${config.primaryColor}18 0%, ${config.accentColor}14 100%)`}
+            primaryColor={config.primaryColor}
+            accentColor={config.accentColor}
+            alt="hero visual"
+          />
+
+          <div
+            className="absolute bottom-0 left-0 h-2 w-28"
+            style={{ backgroundColor: config.accentColor }}
+            aria-hidden="true"
           />
         </div>
-      </div>
-
-      {/* Right: photo (60%) — edge-to-edge cover */}
-      <div className="relative overflow-hidden min-h-[400px] md:min-h-0">
-        <EditableImage
-          url={block.imageUrl}
-          onChange={(url) => u({ imageUrl: url })}
-          className="absolute inset-0 w-full h-full"
-          placeholderGradient={`linear-gradient(160deg, ${config.primaryColor}30 0%, ${config.accentColor}20 100%)`}
-          primaryColor={config.primaryColor}
-          accentColor={config.accentColor}
-          alt="hero background"
-        />
       </div>
     </section>
   );
